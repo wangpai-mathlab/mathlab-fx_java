@@ -1,8 +1,8 @@
 package org.wangpai.mathlab.exp.model;
 
 import org.junit.jupiter.api.Test;
-import org.wangpai.mathlab.basic.enumeration.Symbol;
-import org.wangpai.mathlab.exception.checked.UndefinedException;
+import org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol;
+import org.wangpai.mathlab.exp.exception.checked.UndefinedExpException;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,9 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.ONE;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.THREE;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.TWO;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.ONE;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.THREE;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.TWO;
 
 /**
  * @since 2021-7-29
@@ -29,7 +29,7 @@ public class SymbolOutputStreamTest {
      * init、hasNext、next、peek、rollback、clear
      */
     @Test
-    public void associationTest() throws UndefinedException {
+    public void associationTest() throws UndefinedExpException {
         this.outputStream.init(this.str);
         assertTrue(this.outputStream.hasNext());
         assertEquals(Symbol.getEnum("1"), this.outputStream.next());
@@ -51,13 +51,13 @@ public class SymbolOutputStreamTest {
         assertEquals(Symbol.getEnum("+"), this.outputStream.next());
 
 
-        Throwable throwable = assertThrows(UndefinedException.class,
+        Throwable throwable = assertThrows(UndefinedExpException.class,
                 () -> this.outputStream.init("abcdef"));
         assertEquals("异常：输入了未定义符号", throwable.getMessage());
     }
 
     @Test
-    public void getRead() throws UndefinedException {
+    public void getRead() throws UndefinedExpException {
         this.outputStream.init(this.str);
 
         // 测试初始情况
@@ -79,7 +79,7 @@ public class SymbolOutputStreamTest {
     }
 
     @Test
-    public void getRest() throws UndefinedException {
+    public void getRest() throws UndefinedExpException {
         this.outputStream.init(this.str);
 
         // 测试初始情况
@@ -101,7 +101,7 @@ public class SymbolOutputStreamTest {
     }
 
     @Test
-    public void toArray() throws UndefinedException {
+    public void toArray() throws UndefinedExpException {
         SymbolOutputStream symbolOutputStream = new SymbolOutputStream();
         symbolOutputStream.init("123");
 
@@ -110,7 +110,7 @@ public class SymbolOutputStreamTest {
     }
 
     @Test
-    public void toString_test() throws UndefinedException {
+    public void toString_test() throws UndefinedExpException {
         this.outputStream.init(this.str);
 
         assertEquals(this.str, this.outputStream.toString());

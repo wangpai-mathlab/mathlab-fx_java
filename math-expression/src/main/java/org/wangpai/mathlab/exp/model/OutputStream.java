@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.wangpai.logfx.Logfx;
 import org.wangpai.mathlab.exception.checked.MathlabCheckedException;
-import org.wangpai.mathlab.exception.checked.UndefinedException;
+import org.wangpai.mathlab.exp.exception.checked.UndefinedExpException;
 
 /**
  * @since 2021-8-1
  */
-@Slf4j
 public abstract class OutputStream<T> implements Cloneable {
     /**
      * 为了减少子类设计的工作量，
@@ -64,7 +63,7 @@ public abstract class OutputStream<T> implements Cloneable {
         try {
             cloned = (OutputStream<T>) super.clone();
         } catch (CloneNotSupportedException exception) {
-            log.error("发生了非自定义异常：", exception);
+            Logfx.error("发生了非自定义异常：", exception); // FIXME：2022年11月18日 发现此处代码有问题，以后再修复
         }
         cloned.outputStream = (ArrayList<T>) this.outputStream.clone();
         cloned.length = this.length;
@@ -113,9 +112,9 @@ public abstract class OutputStream<T> implements Cloneable {
      *
      * @since before 2021-8-5
      */
-    public OutputStream<T> rollback(T rollbackedData) throws UndefinedException {
+    public OutputStream<T> rollback(T rollbackedData) throws UndefinedExpException {
         if (rollbackedData == null) {
-            throw new UndefinedException("异常：输入了未定义符号");
+            throw new UndefinedExpException("异常：输入了未定义符号");
         }
         this.outputStream.set(--this.index, rollbackedData);
         return this;

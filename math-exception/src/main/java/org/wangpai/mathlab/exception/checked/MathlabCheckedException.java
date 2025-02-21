@@ -4,9 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.wangpai.exception.base.WangpaiCheckedException;
 
 /**
- * 本项目的检查型异常基类
+ * 本项目的检查型异常基类。这指的是一种意料之中可能发生的异常
  *
  * @since 2021-7-9
  * @lastModified 2022-8-29
@@ -14,7 +15,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
-public abstract class MathlabCheckedException extends Exception {
+public abstract class MathlabCheckedException extends WangpaiCheckedException {
     private String exceptionMsg;
     private Object data;
 

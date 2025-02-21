@@ -4,25 +4,24 @@ import java.util.Collections;
 import java.util.Stack;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.wangpai.mathlab.basic.enumeration.Symbol;
-import org.wangpai.mathlab.basic.operand.Decimal;
-import org.wangpai.mathlab.basic.operand.Operand;
-import org.wangpai.mathlab.basic.operand.Rational;
-import org.wangpai.mathlab.basic.operation.RationalOperation;
-import org.wangpai.mathlab.basic.operator.Operator;
+import org.wangpai.logfx.Logfx;
+import org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Decimal;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Operand;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Rational;
+import org.wangpai.mathlab.advanced.numeric.basic.operation.RationalOperation;
+import org.wangpai.mathlab.advanced.numeric.basic.operator.Operator;
 import org.wangpai.mathlab.exception.checked.MathlabCheckedException;
-import org.wangpai.mathlab.exception.checked.SyntaxException;
-import org.wangpai.mathlab.exception.checked.UndefinedException;
+import org.wangpai.mathlab.exp.exception.checked.SyntaxExpException;
+import org.wangpai.mathlab.exp.exception.checked.UndefinedExpException;
 
-import static org.wangpai.mathlab.basic.enumeration.Symbol.DOT;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.LEFT_BRACKET;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.RIGHT_BRACKET;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.DOT;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.LEFT_BRACKET;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.RIGHT_BRACKET;
 
 /**
  * @since 2021-8-1
  */
-@Slf4j
 public final class CalculatorData implements Cloneable {
     /**
      * 注意：对于 Stack，其栈底的序号为 0，入栈、出栈操作均是在栈顶进行的
@@ -137,7 +136,7 @@ public final class CalculatorData implements Cloneable {
             try {
                 operator = new Operator(symbol);
             } catch (Exception exception) {
-                log.error("异常：", exception);
+                Logfx.error("异常：", exception);
             }
             this.optrs.push(operator);
             this.calculatedExp.push(operator);
@@ -236,16 +235,16 @@ public final class CalculatorData implements Cloneable {
                     return RationalOperation.multiply((Rational) opndLeft, (Rational) opndRight);
                 case DIVIDE:
                     if (opndRight.isZero()) {
-                        throw new SyntaxException("错误：除数为 0");
+                        throw new SyntaxExpException("错误：除数为 0");
                     }
                     return RationalOperation.divide((Rational) opndLeft, (Rational) opndRight);
 
                 default:
-                    throw new UndefinedException("异常：不支持这种运算");
+                    throw new UndefinedExpException("异常：不支持这种运算");
             }
         }
 
-        throw new UndefinedException("异常：含有不支持的运算符");
+        throw new UndefinedExpException("异常：含有不支持的运算符");
     }
 
     /**
@@ -258,7 +257,7 @@ public final class CalculatorData implements Cloneable {
         try {
             cloned = (CalculatorData) super.clone();
         } catch (CloneNotSupportedException exception) {
-            log.error("发生了非自定义异常：", exception);
+            Logfx.error("发生了非自定义异常：", exception);
         }
 
         cloned.opnds = (Stack<Operand>) this.opnds.clone();

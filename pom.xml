@@ -8,28 +8,36 @@
     <!-- 此部分不能使用 <properties/...> 中的元素来取代，必须直接给出具体的内容  -->
     <groupId>org.wangpai.mathlab</groupId>
     <artifactId>mathlab-fx</artifactId>
-    <version>2.0</version>
+    <version>3.0</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>math-library</module>
         <module>math-exception</module>
         <module>math-expression</module>
+        <module>math-built-in-type</module>
+        <module>common-tool</module>
         <module>externally-exposed</module>
     </modules>
 
     <properties>
         <!-- 不加此项，JavaFX 打包出来中文会乱码 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- 凡是自定义的属性，都要加 .custom 后缀，以防与已有的预置属性相冲突 -->
-        <project.version.custom>2.0</project.version.custom>
+        <project.version.custom>3.0</project.version.custom>
 
-        <junit.version.custom>5.9.0</junit.version.custom>
-        <lombok.version.custom>1.18.24</lombok.version.custom>
-        <log4j2.version.custom>2.18.0</log4j2.version.custom>
+        <wangpai.exception.version.custom>2.5</wangpai.exception.version.custom>
+        <common-util.type-converter.version.custom>2.0</common-util.type-converter.version.custom>
+        <common-util.jdk-enhance.version.custom>3.1</common-util.jdk-enhance.version.custom>
+        <common-util.random.version.custom>1.2</common-util.random.version.custom>
+        <logfx.version.custom>0.2</logfx.version.custom>
+
+        <lombok.version.custom>1.18.28</lombok.version.custom>
+        <junit.version.custom>5.11.0</junit.version.custom>
 
         <mainclass.custom>无</mainclass.custom>
     </properties>
@@ -48,8 +56,44 @@
             </dependency>
             <dependency>
                 <groupId>org.wangpai.mathlab</groupId>
+                <artifactId>common-tool</artifactId>
+                <version>${project.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.mathlab</groupId>
                 <artifactId>math-expression</artifactId>
                 <version>${project.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.mathlab</groupId>
+                <artifactId>math-built-in-type</artifactId>
+                <version>${project.version.custom}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.wangpai.exception</groupId>
+                <artifactId>exception</artifactId>
+                <version>${wangpai.exception.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.common-util</groupId>
+                <artifactId>type-converter</artifactId>
+                <version>${common-util.type-converter.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.common-util</groupId>
+                <artifactId>jdk-enhance</artifactId>
+                <version>${common-util.jdk-enhance.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.common-util</groupId>
+                <artifactId>random</artifactId>
+                <version>${common-util.random.version.custom}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wangpai.logfx</groupId>
+                <artifactId>log-adapter</artifactId>
+                <version>${logfx.version.custom}</version>
             </dependency>
 
             <dependency>
@@ -57,22 +101,6 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version.custom}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${log4j2.version.custom}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4j2.version.custom}</version>
-            </dependency>
-            <!-- 设置 SLF4J 与之绑定的日志包。无需提供 SLF4J 的 JAR 包，因为 Lombok 已经提供了 -->
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${log4j2.version.custom}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>

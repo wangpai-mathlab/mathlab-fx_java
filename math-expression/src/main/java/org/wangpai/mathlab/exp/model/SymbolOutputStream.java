@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
-import org.wangpai.mathlab.basic.enumeration.Symbol;
-import org.wangpai.mathlab.exception.checked.UndefinedException;
+import org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol;
+import org.wangpai.mathlab.exp.exception.checked.UndefinedExpException;
 
 /**
  * @since 2021-8-1
@@ -34,7 +34,7 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
      */
     @Deprecated
     @Override
-    protected SymbolOutputStream init(Object obj) throws UndefinedException {
+    protected SymbolOutputStream init(Object obj) throws UndefinedExpException {
         /**
          * 由于 Java 语法不允许类型带泛型，所以此方法不提供带泛型变量的类型的初始化
          */
@@ -48,7 +48,7 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
             return this.init((char[]) obj);
         }
 
-        throw new UndefinedException("异常：无法使用此数据进行初始化");
+        throw new UndefinedExpException("异常：无法使用此数据进行初始化");
     }
 
     /**
@@ -80,7 +80,7 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
      * @lastModified 2021-8-8
      * @since 2021-8-1
      */
-    public SymbolOutputStream init(String str) throws UndefinedException {
+    public SymbolOutputStream init(String str) throws UndefinedExpException {
         return this.init(str.toCharArray());
     }
 
@@ -95,10 +95,10 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
         return this;
     }
 
-    public SymbolOutputStream init(char[] charArray) throws UndefinedException {
+    public SymbolOutputStream init(char[] charArray) throws UndefinedExpException {
         var preInitCheck = SymbolOutputStream.preInitCheck(charArray);
         if (preInitCheck != null) {
-            throw new UndefinedException("异常：输入了未定义符号", preInitCheck);
+            throw new UndefinedExpException("异常：输入了未定义符号", preInitCheck);
         }
 
         this.sSInfo = SymbolOutputStream.tidy(charArray);
@@ -172,14 +172,14 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
      *
      * @since 2021-8-1
      */
-    private static List<String> tidy(char[] charArray) throws UndefinedException {
+    private static List<String> tidy(char[] charArray) throws UndefinedExpException {
         var result = new ArrayList<String>();
         for (var ch : charArray) {
             result.add(Character.toString(ch));
         }
 
         if (false) { // 示意代码
-            throw new UndefinedException("敬请期待", charArray);
+            throw new UndefinedExpException("敬请期待", charArray);
         }
 
         return result;
@@ -194,7 +194,7 @@ public final class SymbolOutputStream extends OutputStream<Symbol> {
         List<String> originSymbols = null;
         try {
             originSymbols = SymbolOutputStream.tidy(charArray);
-        } catch (UndefinedException exception) {
+        } catch (UndefinedExpException exception) {
             var data = exception.getData();
             if (data instanceof String) {
                 return (String) data;

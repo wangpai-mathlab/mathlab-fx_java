@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.wangpai.mathlab.basic.operand.Operand;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Operand;
 
 import static org.wangpai.mathlab.exp.model.CalculatorState.INIT;
 

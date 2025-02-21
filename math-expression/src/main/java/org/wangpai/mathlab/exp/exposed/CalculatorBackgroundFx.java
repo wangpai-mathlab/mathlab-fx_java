@@ -6,26 +6,26 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
-import org.wangpai.mathlab.basic.enumeration.Symbol;
-import org.wangpai.mathlab.basic.operand.Operand;
-import org.wangpai.mathlab.basic.operand.Rational;
-import org.wangpai.mathlab.basic.operator.Operator;
+import org.wangpai.logfx.Logfx;
+import org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Operand;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Rational;
+import org.wangpai.mathlab.advanced.numeric.basic.operator.Operator;
 import org.wangpai.mathlab.exception.checked.MathlabCheckedException;
-import org.wangpai.mathlab.exception.checked.SyntaxException;
+import org.wangpai.mathlab.exp.exception.checked.SyntaxExpException;
 import org.wangpai.mathlab.exp.model.Action;
 import org.wangpai.mathlab.exp.model.CalculatorData;
 import org.wangpai.mathlab.exp.model.CalculatorState;
 import org.wangpai.mathlab.exp.model.OutputStream;
 import org.wangpai.mathlab.exp.model.SymbolOutputStream;
 
-import static org.wangpai.mathlab.basic.enumeration.Symbol.ADD;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.DIVIDE;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.DOT;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.EQUAL;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.LEFT_BRACKET;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.RIGHT_BRACKET;
-import static org.wangpai.mathlab.basic.enumeration.Symbol.ZERO;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.ADD;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.DIVIDE;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.DOT;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.EQUAL;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.LEFT_BRACKET;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.RIGHT_BRACKET;
+import static org.wangpai.mathlab.advanced.numeric.basic.enumeration.Symbol.ZERO;
 import static org.wangpai.mathlab.exp.model.CalculatorState.END;
 import static org.wangpai.mathlab.exp.model.CalculatorState.ERROR;
 import static org.wangpai.mathlab.exp.model.CalculatorState.INIT;
@@ -34,7 +34,6 @@ import static org.wangpai.mathlab.exp.model.CalculatorState.NORMAL;
 /**
  * @since 2021-8-1
  */
-@Slf4j
 @Accessors(chain = true)
 public class CalculatorBackgroundFx {
     private int calculationTimes = 0;
@@ -272,7 +271,7 @@ public class CalculatorBackgroundFx {
      * 一般先调用一次本方法，然后调用一次方法 readSymbol，接着再调用本方法，以此类推
      */
     private void syntaxCheck(CalculatorData calData, Symbol input)
-            throws SyntaxException {
+            throws SyntaxExpException {
         /**
          * 先尽可能处理所有简单、能单独判断的语法错误
          *
@@ -282,8 +281,8 @@ public class CalculatorBackgroundFx {
 
         // 一个操作数里，输入了两个小数点
         if (input == DOT && calData.searchFromBuff(DOT) != -1) {
-            var ERROR_INFO = "你不能在一个数里输入两个【.】，已为你自动删除【.】";
-            throw new SyntaxException(ERROR_INFO,
+            final var errorInfo = "你不能在一个数里输入两个【.】，已为你自动删除【.】";
+            throw new SyntaxExpException(errorInfo,
                     this.generateExpressionString(calData.getExp()));
         }
         // 如果前面没有第一个操作数或右括号，但是后面输入了非数字（例外有：左括号、一元运算符）
@@ -296,20 +295,20 @@ public class CalculatorBackgroundFx {
              * > 2. 不为【数字或右括号】
              * 解释：括号的问题将在后面的条件来单独判断，此处只需要关心二元运算符的语法错误
              */
-            var ERROR_INFO = "注意：在输入" + "【" + input + "】" + "前，你必须先输入一个合法的数。"
+            final var errorInfo = "注意：在输入" + "【" + input + "】" + "前，你必须先输入一个合法的数。"
                     + "已为你自动删除" + "【" + input + "】";
 
-            throw new SyntaxException(ERROR_INFO,
+            throw new SyntaxExpException(errorInfo,
                     this.generateExpressionString(calData.getExp()));
         }
         // 连续输入两个非数字符，例外是【第二个为左括号，第一个为其它】、【第一个为右括号，第二个为其它】
         if (!(input.isDigit() || input == LEFT_BRACKET) && !calData.expIsEmpty()
                 && !(calData.peekFromExp().isDigit() || calData.peekFromExp() == RIGHT_BRACKET)) {
-            var ERROR_INFO = "你不能在" + "【" + calData.peekFromExp() + "】" + "的后面输入"
+            final var errorInfo = "你不能在" + "【" + calData.peekFromExp() + "】" + "的后面输入"
                     + "【" + input + "】" + "，已为你自动删除"
                     + "【" + input + "】" + "：";
 
-            throw new SyntaxException(ERROR_INFO,
+            throw new SyntaxExpException(errorInfo,
                     this.generateExpressionString(calData.getExp()));
         }
         // 如果输入的是数字
@@ -318,16 +317,16 @@ public class CalculatorBackgroundFx {
             if (!calData.opndBuffIsEmpty() && calData.peekFromBuff() == ZERO
                     && calData.opndBuffSize() == 1) {
                 // 此 if 中的前三个判断用于判断 opndBuff 中是否只有 0
-                var ERROR_INFO = "你不能一开始就在数中输入【0】，已为你自动删除【0】";
+                final var errorInfo = "你不能一开始就在数中输入【0】，已为你自动删除【0】";
                 calData.popFromExp(); // 删除一开始输入的 0
-                throw new SyntaxException(ERROR_INFO,
+                throw new SyntaxExpException(errorInfo,
                         this.generateExpressionString(calData.getExp()));
             }
             // 数字前面有右括号
             if (!calData.expIsEmpty() && calData.peekFromExp() == RIGHT_BRACKET) {
-                var ERROR_INFO = "你不能在右括号后输入数字" + "【" + input + "】" +
+                final var errorInfo = "你不能在右括号后输入数字" + "【" + input + "】" +
                         "。已为你自动删除" + "【" + input + "】";
-                throw new SyntaxException(ERROR_INFO,
+                throw new SyntaxExpException(errorInfo,
                         this.generateExpressionString(calData.getExp()));
             }
         }
@@ -335,9 +334,9 @@ public class CalculatorBackgroundFx {
         if (input == LEFT_BRACKET && !calData.expIsEmpty()
                 && (calData.peekFromExp().isDigit()
                 || calData.peekFromExp() == DOT)) {
-            var ERROR_INFO = "左括号前面不能有字符" + "【" + calData.peekFromExp() + "】" +
+            final var errorInfo = "左括号前面不能有字符" + "【" + calData.peekFromExp() + "】" +
                     "（左括号前面不能有数字、小数点），已为你自动删除【(】";
-            throw new SyntaxException(ERROR_INFO,
+            throw new SyntaxExpException(errorInfo,
                     this.generateExpressionString(calData.getExp()));
         }
         // 如果输入的是右括号
@@ -347,7 +346,7 @@ public class CalculatorBackgroundFx {
                     calData.peekFromExp() == LEFT_BRACKET) {
                 var TIP = "这一对括号里什么也没有，已为你自动删除这一对括号：";
                 calData.popFromExp();
-                throw new SyntaxException(TIP,
+                throw new SyntaxExpException(TIP,
                         this.generateExpressionString(calData.getExp()));
             }
 
@@ -356,9 +355,9 @@ public class CalculatorBackgroundFx {
                 /**
                  * 注意，右括号前面的左括号在前面已进行了判断。所以第二个判断条件可以改为非数字
                  */
-                var ERROR_INFO = "右括号前面不能有运算符" + "【" + input + "】"
+                final var errorInfo = "右括号前面不能有运算符" + "【" + input + "】"
                         + "，已为你自动删除" + "【" + input + "】";
-                throw new SyntaxException(ERROR_INFO,
+                throw new SyntaxExpException(errorInfo,
                         this.generateExpressionString(calData.getExp()));
             }
 
@@ -371,16 +370,16 @@ public class CalculatorBackgroundFx {
              * 此处，只有右括号多于左括号时，才需要进行错误处理
              */
             if (tempCalData.bracketMatch() == 2) {
-                var ERROR_INFO = "右括号不匹配，已为你自动删除【)】";
-                throw new SyntaxException(ERROR_INFO,
+                final var errorInfo = "右括号不匹配，已为你自动删除【)】";
+                throw new SyntaxExpException(errorInfo,
                         this.generateExpressionString(calData.getExp()));
             }
         }
         // 最后准备结束输入时，如果发现括号不匹配
         if (input == EQUAL && calData.bracketMatch() != 0) {
             // 此处实际上只可能左括号多于右括号
-            var ERROR_INFO = "左括号不能多于右括号，已为你自动删除【=】";
-            throw new SyntaxException(ERROR_INFO,
+            final var errorInfo = "左括号不能多于右括号，已为你自动删除【=】";
+            throw new SyntaxExpException(errorInfo,
                     this.generateExpressionString(calData.getExp()));
         }
     }
@@ -398,16 +397,16 @@ public class CalculatorBackgroundFx {
                  * 这里没有将此判断放置到前面的语法错误中来判断，
                  * 因为操作数是可以有多位的，所以那里不方便判断用户是否真正想输入 0
                  */
-                var ERROR_INFO = "抱歉，0 不能作除数，已为你自动删除：";
+                final var errorInfo = "抱歉，0 不能作除数，已为你自动删除：";
 
                 calData.popFromExp();
-                throw new SyntaxException(ERROR_INFO, calData.getExp());
+                throw new SyntaxExpException(errorInfo, calData.getExp());
             } else {
                 /**
                  * 如果此 0 属于运算的中间结果。当此情况发生时，只能放弃整个表达式
                  */
-                var ERROR_INFO = "中间有算式让除数为 0，计算失败";
-                throw new SyntaxException(ERROR_INFO, outputStream.toString());
+                final var errorInfo = "中间有算式让除数为 0，计算失败";
+                throw new SyntaxExpException(errorInfo, outputStream.toString());
             } // 内层 else
         } // 外层 if
     } // 本方法的右括号
@@ -480,7 +479,7 @@ public class CalculatorBackgroundFx {
                             .toList()));
             outputStream = new SymbolOutputStream().init(expression);
         } catch (Exception exception) {
-            log.error("异常：", exception);
+            Logfx.error("异常：", exception);
         }
 
         var calData = new CalculatorData();
@@ -509,7 +508,7 @@ public class CalculatorBackgroundFx {
                     try {
                         priority = this.precede(calData.peekFromOptrs(), new Operator(input));
                     } catch (Exception exception) {
-                        log.error("异常：", exception);
+                        Logfx.error("异常：", exception);
                     }
                     switch (priority) {
                         case "<": // 当前读取的运算符优先级大于最近的运算符。那当前读取的运算符就直接入栈
@@ -528,7 +527,7 @@ public class CalculatorBackgroundFx {
                                     isPaired = this.precede(calData.peekFromOptrs(), new Operator(input)).equals("=");
                                 }
                             } catch (Exception exception) {
-                                log.error("异常：", exception);
+                                Logfx.error("异常：", exception);
                             }
                             if (isPaired) {
                                 /**
@@ -616,7 +615,7 @@ public class CalculatorBackgroundFx {
                                 .toList(), EQUAL));
             }
         } catch (Exception exception) {
-            log.error("异常：", exception);
+            Logfx.error("异常：", exception);
         }
 
         return sb.toString();

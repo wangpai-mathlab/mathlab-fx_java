@@ -1,6 +1,6 @@
 package org.wangpai.mathlab.exp.exposed;
 
-import org.wangpai.mathlab.basic.operand.Operand;
+import org.wangpai.mathlab.advanced.numeric.basic.operand.Operand;
 import org.wangpai.mathlab.exp.model.CalculationResultOutput;
 
 /**
